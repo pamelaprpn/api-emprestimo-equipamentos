@@ -13,6 +13,7 @@ public class Colaborador {
     private String nome;
     @Email
     @NotBlank
+    @Column(unique = true, nullable = false)
     private String email;
     @NotBlank
     private String cargo;
