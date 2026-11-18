@@ -1,5 +1,9 @@
 package com.emprestimo.equipamentos.service;
 
+import com.emprestimo.equipamentos.dto.EquipamentoAtualizacaoDTO;
+import com.emprestimo.equipamentos.dto.EquipamentoRequestDTO;
+import com.emprestimo.equipamentos.dto.EquipamentoResponseDTO;
+import com.emprestimo.equipamentos.mapper.EquipamentoMapper;
 import com.emprestimo.equipamentos.model.Emprestimo;
 import com.emprestimo.equipamentos.model.Equipamento;
 import com.emprestimo.equipamentos.model.TipoEquipamento;
@@ -21,43 +25,55 @@ public class EquipamentoService {
     }
 
 
-    public List<Equipamento> listar(TipoEquipamento tipo, Boolean disponivel){
+    public List<EquipamentoResponseDTO> listar(TipoEquipamento tipo, Boolean disponivel){
+        List<Equipamento> equipamentos;
+
         if(tipo == null && disponivel == null){
-            return equipamentoRepository.findAll();
+            equipamentos = equipamentoRepository.findAll();
         }else if(tipo != null && disponivel == null){
-            return equipamentoRepository.findByTipo(tipo);
+            equipamentos = equipamentoRepository.findByTipo(tipo);
         }else if(tipo == null && disponivel != null) {
-            return equipamentoRepository.findByDisponivel(disponivel);
+            equipamentos =  equipamentoRepository.findByDisponivel(disponivel);
+        }else{
+            equipamentos = equipamentoRepository.findByTipoAndDisponivel(tipo, disponivel);
         }
 
-        return equipamentoRepository.findByTipoAndDisponivel(tipo, disponivel);
-
+        return equipamentos.stream()
+                .map(equipamento -> EquipamentoMapper.toResponseDTO(equipamento))
+                .toList();
     }
 
-    public Equipamento buscar(Long id){
-        return equipamentoRepository.findById(id)
+    public EquipamentoResponseDTO buscar(Long id){
+       Equipamento equipamento = equipamentoRepository.findById(id)
                .orElseThrow(() -> new IllegalArgumentException("Equipamento não encontrado"));
+
+        return EquipamentoMapper.toResponseDTO(equipamento);
     }
 
-    public Equipamento cadastrar(Equipamento equipamento){
-       if(equipamentoRepository.existsByPatrimonio(equipamento.getPatrimonio())){
-           throw new IllegalStateException( "Já existe um equipamento cadastrado com esse patrimônio!");
-       }
+    public EquipamentoResponseDTO cadastrar(EquipamentoRequestDTO dto){
+        if(equipamentoRepository.existsByPatrimonio(dto.patrimonio())){
+            throw new IllegalStateException( "Já existe um equipamento cadastrado com esse patrimônio!");
+        }
 
-       equipamento.setDisponivel(true);
+        Equipamento equipamento = EquipamentoMapper.toEntity(dto);
 
-       return  equipamentoRepository.save(equipamento);
+        equipamento.setDisponivel(true);
+
+        Equipamento equipamentoSalvo = equipamentoRepository.save(equipamento);
+
+        return EquipamentoMapper.toResponseDTO(equipamentoSalvo);
     }
 
-    public Equipamento atualizar(Long id, Equipamento dados){
+    public EquipamentoResponseDTO atualizar(Long id, EquipamentoAtualizacaoDTO dtoDados){
         Equipamento equipamento = equipamentoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Equipamento não existe!"));
 
-        equipamento.setNome(dados.getNome());
-        equipamento.setTipo(dados.getTipo());
+        equipamento.setNome(dtoDados.nome());
+        equipamento.setTipo(dtoDados.tipo());
 
-        return equipamentoRepository.save(equipamento);
+        Equipamento equipamentoAtualizado = equipamentoRepository.save(equipamento);
 
+        return EquipamentoMapper.toResponseDTO(equipamentoAtualizado);
     }
 
     public void remover(Long id){
