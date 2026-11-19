@@ -45,7 +45,7 @@ public class EquipamentoService {
 
     public EquipamentoResponseDTO buscar(Long id){
        Equipamento equipamento = equipamentoRepository.findById(id)
-               .orElseThrow(() -> new IllegalArgumentException("Equipamento não encontrado"));
+               .orElseThrow(() -> new IllegalArgumentException("Equipamento não encontrado."));
 
         return EquipamentoMapper.toResponseDTO(equipamento);
     }
@@ -59,9 +59,7 @@ public class EquipamentoService {
 
         equipamento.setDisponivel(true);
 
-        Equipamento equipamentoSalvo = equipamentoRepository.save(equipamento);
-
-        return EquipamentoMapper.toResponseDTO(equipamentoSalvo);
+        return EquipamentoMapper.toResponseDTO(equipamentoRepository.save(equipamento));
     }
 
     public EquipamentoResponseDTO atualizar(Long id, EquipamentoAtualizacaoDTO dtoDados){
@@ -71,9 +69,7 @@ public class EquipamentoService {
         equipamento.setNome(dtoDados.nome());
         equipamento.setTipo(dtoDados.tipo());
 
-        Equipamento equipamentoAtualizado = equipamentoRepository.save(equipamento);
-
-        return EquipamentoMapper.toResponseDTO(equipamentoAtualizado);
+        return EquipamentoMapper.toResponseDTO(equipamentoRepository.save(equipamento));
     }
 
     public void remover(Long id){
