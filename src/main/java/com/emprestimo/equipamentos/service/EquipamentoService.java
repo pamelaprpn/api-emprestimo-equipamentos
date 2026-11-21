@@ -3,6 +3,7 @@ package com.emprestimo.equipamentos.service;
 import com.emprestimo.equipamentos.dto.EquipamentoAtualizacaoDTO;
 import com.emprestimo.equipamentos.dto.EquipamentoRequestDTO;
 import com.emprestimo.equipamentos.dto.EquipamentoResponseDTO;
+import com.emprestimo.equipamentos.exception.RecursoNaoEncontradoException;
 import com.emprestimo.equipamentos.mapper.EquipamentoMapper;
 import com.emprestimo.equipamentos.model.Emprestimo;
 import com.emprestimo.equipamentos.model.Equipamento;
@@ -45,7 +46,7 @@ public class EquipamentoService {
 
     public EquipamentoResponseDTO buscar(Long id){
        Equipamento equipamento = equipamentoRepository.findById(id)
-               .orElseThrow(() -> new IllegalArgumentException("Equipamento não encontrado."));
+               .orElseThrow(() -> new RecursoNaoEncontradoException("Equipamento não encontrado."));
 
         return EquipamentoMapper.toResponseDTO(equipamento);
     }

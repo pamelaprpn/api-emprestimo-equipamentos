@@ -2,6 +2,7 @@ package com.emprestimo.equipamentos.service;
 
 import com.emprestimo.equipamentos.dto.ColaboradorRequestDTO;
 import com.emprestimo.equipamentos.dto.ColaboradorResponseDTO;
+import com.emprestimo.equipamentos.exception.RecursoNaoEncontradoException;
 import com.emprestimo.equipamentos.mapper.ColaboradorMapper;
 import com.emprestimo.equipamentos.model.Colaborador;
 import com.emprestimo.equipamentos.repository.ColaboradorRepository;
@@ -28,7 +29,7 @@ public class ColaboradorService {
 
     public ColaboradorResponseDTO buscar(Long id){
         Colaborador colaborador = colaboradorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Colaborador não encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Colaborador não encontrado."));
 
         return ColaboradorMapper.toResponseDTO(colaborador);
     }

@@ -16,7 +16,7 @@ public class Emprestimo {
     private Long colaboradorId;
     private LocalDate dataEmprestimo;
     private LocalDate dataPrevistaDevolucao;
-    private LocalDate dataDevolucao = null;
+    private LocalDate dataDevolucao;
 
     public Emprestimo(){
 
@@ -63,12 +63,7 @@ public class Emprestimo {
     }
 
     public boolean estaAtrasadoEm(LocalDate data){
-        if(dataPrevistaDevolucao.isBefore(data) && dataDevolucao == null){
-            return true;
-        }
-
-        return false;
-
+        return dataPrevistaDevolucao.isBefore(data) && dataDevolucao == null;
     }
 
     public boolean isAtrasado(){
