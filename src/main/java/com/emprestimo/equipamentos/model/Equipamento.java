@@ -1,5 +1,6 @@
 package com.emprestimo.equipamentos.model;
 
+import com.emprestimo.equipamentos.exception.RegraNegocioException;
 import jakarta.persistence.*;
 
 @Entity
@@ -56,7 +57,7 @@ public class Equipamento {
 
     public void emprestar(){
         if (!disponivel) {
-            throw new IllegalStateException(
+            throw new RegraNegocioException(
                     "Equipamento não está disponível no momento!"
             );
         }

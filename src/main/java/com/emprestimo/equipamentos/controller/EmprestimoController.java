@@ -1,18 +1,17 @@
 package com.emprestimo.equipamentos.controller;
 
-import com.emprestimo.equipamentos.dto.EmprestimoRequestDTO;
 import com.emprestimo.equipamentos.dto.EmprestimoResponseDTO;
-import com.emprestimo.equipamentos.dto.EquipamentoResponseDTO;
-import com.emprestimo.equipamentos.mapper.EmprestimoMapper;
 import com.emprestimo.equipamentos.service.EmprestimoService;
-import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/emprestimos")
+@Validated
 public class EmprestimoController {
 
     private final EmprestimoService emprestimoService;
@@ -34,8 +33,8 @@ public class EmprestimoController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public EmprestimoResponseDTO emprestar(
-            @RequestParam Long equipamentoId,
-            @RequestParam Long colaboradorId) {
+            @RequestParam @NotNull Long equipamentoId,
+            @RequestParam @NotNull Long colaboradorId) {
         return emprestimoService.emprestar(equipamentoId, colaboradorId);
     }
 

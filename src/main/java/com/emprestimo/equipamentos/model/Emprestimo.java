@@ -1,5 +1,6 @@
 package com.emprestimo.equipamentos.model;
 
+import com.emprestimo.equipamentos.exception.RegraNegocioException;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -55,11 +56,13 @@ public class Emprestimo {
     }
 
     public void devolver(LocalDate data){
-        if(dataDevolucao != null){
-            throw new IllegalStateException("Equipamento já foi devolvido!");
+        if (dataDevolucao != null) {
+            throw new RegraNegocioException(
+                    "Equipamento já foi devolvido!"
+            );
         }
-        dataDevolucao = data;
 
+        dataDevolucao = data;
     }
 
     public boolean estaAtrasadoEm(LocalDate data){

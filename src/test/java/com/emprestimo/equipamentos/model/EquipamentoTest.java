@@ -1,5 +1,6 @@
 package com.emprestimo.equipamentos.model;
 
+import com.emprestimo.equipamentos.exception.RegraNegocioException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,9 +20,10 @@ public class EquipamentoTest {
         Equipamento equipamento = new Equipamento();
         equipamento.setDisponivel(false);
 
-        assertThrows(IllegalStateException.class, () -> {
-            equipamento.emprestar();
-        });
+        assertThrows(
+                RegraNegocioException.class,
+                () -> equipamento.emprestar()
+        );
     }
 
     @Test

@@ -58,13 +58,18 @@ public class EmprestimoService {
 
     @Transactional
     public EmprestimoResponseDTO emprestar(Long equipamentoId, Long colaboradorId) {
-
         LocalDate hoje = LocalDate.now();
 
         Equipamento equipamento = equipamentoRepository.findById(equipamentoId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Equipamento não encontrado: id=" + equipamentoId
                 ));
+
+        if (!equipamento.isDisponivel()) {
+            throw new RegraNegocioException(
+                    "Equipamento não está disponível para empréstimo."
+            );
+        }
 
         if (!colaboradorRepository.existsById(colaboradorId)) {
             throw new RecursoNaoEncontradoException(

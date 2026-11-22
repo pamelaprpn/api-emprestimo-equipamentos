@@ -1,5 +1,6 @@
 package com.emprestimo.equipamentos.model;
 
+import com.emprestimo.equipamentos.exception.RegraNegocioException;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -36,8 +37,9 @@ public class EmprestimoTest {
 
         emprestimo.devolver(LocalDate.of(2026, 11, 20));
 
-        assertThrows(IllegalStateException.class, () ->
+        assertThrows(RegraNegocioException.class, () ->
                 emprestimo.devolver(LocalDate.of(2026, 11, 21)));
+
     }
 
     @Test

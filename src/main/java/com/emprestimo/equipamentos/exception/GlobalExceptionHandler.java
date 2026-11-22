@@ -1,7 +1,9 @@
 package com.emprestimo.equipamentos.exception;
 
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -23,4 +25,27 @@ public class GlobalExceptionHandler {
     }
 
     public record ErrorResponse(String mensagem, LocalDateTime timestamp) {}
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidacao(MethodArgumentNotValidException ex) {
+
+        String mensagem = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(erro -> erro.getField() + ": " + erro.getDefaultMessage())
+                .findFirst()
+                .orElse("Dados inválidos.");
+
+        ErrorResponse corpo = new ErrorResponse(mensagem, LocalDateTime.now());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(corpo);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleViolacao(ConstraintViolationException ex) {
+
+        ErrorResponse corpo = new ErrorResponse(ex.getMessage(), LocalDateTime.now());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(corpo);
+    }
 }

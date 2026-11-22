@@ -4,8 +4,8 @@ import com.emprestimo.equipamentos.dto.EquipamentoAtualizacaoDTO;
 import com.emprestimo.equipamentos.dto.EquipamentoRequestDTO;
 import com.emprestimo.equipamentos.dto.EquipamentoResponseDTO;
 import com.emprestimo.equipamentos.exception.RecursoNaoEncontradoException;
+import com.emprestimo.equipamentos.exception.RegraNegocioException;
 import com.emprestimo.equipamentos.mapper.EquipamentoMapper;
-import com.emprestimo.equipamentos.model.Emprestimo;
 import com.emprestimo.equipamentos.model.Equipamento;
 import com.emprestimo.equipamentos.model.TipoEquipamento;
 import com.emprestimo.equipamentos.repository.EmprestimoRepository;
@@ -53,7 +53,9 @@ public class EquipamentoService {
 
     public EquipamentoResponseDTO cadastrar(EquipamentoRequestDTO dto){
         if(equipamentoRepository.existsByPatrimonio(dto.patrimonio())){
-            throw new IllegalStateException( "Já existe um equipamento cadastrado com esse patrimônio!");
+            throw new RegraNegocioException(
+                    "Já existe um equipamento cadastrado com esse patrimônio!"
+            );
         }
 
         Equipamento equipamento = EquipamentoMapper.toEntity(dto);
@@ -65,7 +67,7 @@ public class EquipamentoService {
 
     public EquipamentoResponseDTO atualizar(Long id, EquipamentoAtualizacaoDTO dtoDados){
         Equipamento equipamento = equipamentoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Equipamento não existe!"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Equipamento não encontrado."));
 
         equipamento.setNome(dtoDados.nome());
         equipamento.setTipo(dtoDados.tipo());
@@ -75,10 +77,10 @@ public class EquipamentoService {
 
     public void remover(Long id){
         Equipamento equipamento = equipamentoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Equipamento não encontrado!"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Equipamento não encontrado."));
 
         if (emprestimoRepository.existsByEquipamentoId(id)) {
-            throw new IllegalStateException(
+            throw new RegraNegocioException(
                     "Não é possível remover um equipamento com histórico de empréstimos!"
             );
         }
