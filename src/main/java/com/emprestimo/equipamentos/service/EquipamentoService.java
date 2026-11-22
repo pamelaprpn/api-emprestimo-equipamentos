@@ -79,7 +79,7 @@ public class EquipamentoService {
         Equipamento equipamento = equipamentoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Equipamento não encontrado."));
 
-        if (emprestimoRepository.existsByEquipamentoId(id)) {
+        if (emprestimoRepository.existsByEquipamento_Id(id)) {
             throw new RegraNegocioException(
                     "Não é possível remover um equipamento com histórico de empréstimos!"
             );

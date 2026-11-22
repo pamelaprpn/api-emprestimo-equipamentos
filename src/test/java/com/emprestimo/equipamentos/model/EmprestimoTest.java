@@ -1,6 +1,7 @@
 package com.emprestimo.equipamentos.model;
 
 import com.emprestimo.equipamentos.exception.RegraNegocioException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -8,11 +9,20 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class EmprestimoTest {
+    private Equipamento equipamento;
+    private Colaborador colaborador;
+
+    @BeforeEach
+    void setUp() {
+        equipamento = new Equipamento(/* dados obrigatórios do construtor */);
+        colaborador = new Colaborador(/* dados obrigatórios do construtor */);
+    }
+
     @Test
     void deveCriarEmprestimoComPrazoDe14Dias() {
         LocalDate hoje = LocalDate.of(2026, 11, 14);
 
-        Emprestimo emprestimo = new Emprestimo(1L, 1L, hoje);
+        Emprestimo emprestimo = new Emprestimo(equipamento, colaborador, hoje);
 
         assertEquals(hoje, emprestimo.getDataEmprestimo());
         assertEquals(LocalDate.of(2026, 11, 28),
@@ -22,7 +32,7 @@ public class EmprestimoTest {
     @Test
     void deveRegistrarDataDeDevolucao() {
         LocalDate hoje = LocalDate.of(2026, 11, 14);
-        Emprestimo emprestimo = new Emprestimo(1L, 1L, hoje);
+        Emprestimo emprestimo = new Emprestimo(equipamento, colaborador, hoje);
         LocalDate dataDevolucao = LocalDate.of(2026, 11, 20);
 
         emprestimo.devolver(dataDevolucao);
@@ -33,7 +43,7 @@ public class EmprestimoTest {
     @Test
     void naoDevePermitirDevolverDuasVezes() {
         Emprestimo emprestimo = new Emprestimo(
-                1L, 1L, LocalDate.of(2026, 11, 14));
+                equipamento, colaborador, LocalDate.of(2026, 11, 14));
 
         emprestimo.devolver(LocalDate.of(2026, 11, 20));
 
@@ -45,7 +55,7 @@ public class EmprestimoTest {
     @Test
     void deveIdentificarEmprestimoAtrasado() {
         Emprestimo emprestimo = new Emprestimo(
-                1L, 1L, LocalDate.of(2026, 10, 27));
+                equipamento, colaborador, LocalDate.of(2026, 10, 27));
 
         boolean atrasado = emprestimo.estaAtrasadoEm(
                 LocalDate.of(2026, 11, 14));
@@ -56,7 +66,7 @@ public class EmprestimoTest {
     @Test
     void naoDeveIdentificarEmprestimoAindaNoPrazoComoAtrasado() {
         Emprestimo emprestimo = new Emprestimo(
-                1L, 1L, LocalDate.of(2026, 11, 6));
+                equipamento, colaborador, LocalDate.of(2026, 11, 6));
 
         boolean atrasado = emprestimo.estaAtrasadoEm(
                 LocalDate.of(2026, 11, 14));
@@ -67,7 +77,7 @@ public class EmprestimoTest {
     @Test
     void naoDeveIdentificarEmprestimoDevolvidoComoAtrasado() {
         Emprestimo emprestimo = new Emprestimo(
-                1L, 1L, LocalDate.of(2026, 10, 27));
+                equipamento, colaborador, LocalDate.of(2026, 10, 27));
 
         emprestimo.devolver(LocalDate.of(2026, 11, 12));
 
@@ -80,7 +90,7 @@ public class EmprestimoTest {
     @Test
     void naoDeveConsiderarAtrasadoNoDiaDoVencimento() {
         Emprestimo emprestimo = new Emprestimo(
-                1L, 1L, LocalDate.of(2026, 10, 31));
+                equipamento, colaborador, LocalDate.of(2026, 10, 31));
 
         boolean atrasado = emprestimo.estaAtrasadoEm(
                 LocalDate.of(2026, 11, 14));

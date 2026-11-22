@@ -1,9 +1,11 @@
+
 package com.emprestimo.equipamentos.service;
 
 import com.emprestimo.equipamentos.dto.EmprestimoResponseDTO;
 import com.emprestimo.equipamentos.exception.RecursoNaoEncontradoException;
 import com.emprestimo.equipamentos.exception.RegraNegocioException;
 import com.emprestimo.equipamentos.mapper.EmprestimoMapper;
+import com.emprestimo.equipamentos.model.Colaborador;
 import com.emprestimo.equipamentos.model.Emprestimo;
 import com.emprestimo.equipamentos.model.Equipamento;
 import com.emprestimo.equipamentos.repository.ColaboradorRepository;
@@ -22,15 +24,17 @@ public class EmprestimoService {
     private final EquipamentoRepository equipamentoRepository;
     private final ColaboradorRepository colaboradorRepository;
 
-    public EmprestimoService(EmprestimoRepository emprestimoRepository, EquipamentoRepository equipamentoRepository, ColaboradorRepository colaboradorRepository) {
+    public EmprestimoService(
+            EmprestimoRepository emprestimoRepository,
+            EquipamentoRepository equipamentoRepository,
+            ColaboradorRepository colaboradorRepository
+    ) {
         this.emprestimoRepository = emprestimoRepository;
         this.equipamentoRepository = equipamentoRepository;
         this.colaboradorRepository = colaboradorRepository;
-
     }
 
-
-    public List<EmprestimoResponseDTO> listar(Boolean atrasados){
+    public List<EmprestimoResponseDTO> listar(Boolean atrasados) {
         LocalDate hoje = LocalDate.now();
 
         List<Emprestimo> emprestimos;
@@ -45,15 +49,15 @@ public class EmprestimoService {
         return emprestimos.stream()
                 .map(EmprestimoMapper::toResponseDTO)
                 .toList();
-
     }
 
-    public EmprestimoResponseDTO buscar(Long id){
+    public EmprestimoResponseDTO buscar(Long id) {
         Emprestimo emprestimo = emprestimoRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Emprestimo não encontrado: id=" + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Emprestimo não encontrado: id=" + id
+                ));
 
         return EmprestimoMapper.toResponseDTO(emprestimo);
-
     }
 
     @Transactional
@@ -71,14 +75,13 @@ public class EmprestimoService {
             );
         }
 
-        if (!colaboradorRepository.existsById(colaboradorId)) {
-            throw new RecursoNaoEncontradoException(
-                    "Colaborador não encontrado: id=" + colaboradorId
-            );
-        }
+        Colaborador colaborador = colaboradorRepository.findById(colaboradorId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Colaborador não encontrado: id=" + colaboradorId
+                ));
 
         boolean possuiAtrasado = emprestimoRepository
-                .existsByColaboradorIdAndDataDevolucaoIsNullAndDataPrevistaDevolucaoBefore(
+                .existsByColaborador_IdAndDataDevolucaoIsNullAndDataPrevistaDevolucaoBefore(
                         colaboradorId, hoje
                 );
 
@@ -91,8 +94,8 @@ public class EmprestimoService {
         equipamento.emprestar();
 
         Emprestimo emprestimo = new Emprestimo(
-                equipamentoId,
-                colaboradorId,
+                equipamento,
+                colaborador,
                 hoje
         );
 
@@ -102,15 +105,14 @@ public class EmprestimoService {
         return EmprestimoMapper.toResponseDTO(emprestimoSalvo);
     }
 
-
-    public List<EmprestimoResponseDTO> listarDoColaborador(Long colaboradorId){
+    public List<EmprestimoResponseDTO> listarDoColaborador(Long colaboradorId) {
         if (!colaboradorRepository.existsById(colaboradorId)) {
             throw new RecursoNaoEncontradoException(
                     "Colaborador não encontrado: id=" + colaboradorId
             );
         }
 
-        return emprestimoRepository.findByColaboradorId(colaboradorId)
+        return emprestimoRepository.findByColaborador_Id(colaboradorId)
                 .stream()
                 .map(EmprestimoMapper::toResponseDTO)
                 .toList();
@@ -118,22 +120,16 @@ public class EmprestimoService {
 
     @Transactional
     public EmprestimoResponseDTO devolver(Long id) {
-
         LocalDate hoje = LocalDate.now();
 
         Emprestimo emprestimo = emprestimoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
-                    "Empréstimo não encontrado: id=" + id
+                        "Empréstimo não encontrado: id=" + id
                 ));
 
-        Equipamento equipamento = equipamentoRepository
-                .findById(emprestimo.getEquipamentoId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException(
-                        "Equipamento não encontrado: id=" + emprestimo.getEquipamentoId()
-                ));
+        Equipamento equipamento = emprestimo.getEquipamento();
 
         emprestimo.devolver(hoje);
-
         equipamento.devolver();
 
         equipamentoRepository.save(equipamento);
@@ -141,5 +137,4 @@ public class EmprestimoService {
 
         return EmprestimoMapper.toResponseDTO(emprestimoSalvo);
     }
-
 }

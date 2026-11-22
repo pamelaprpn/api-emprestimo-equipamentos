@@ -11,15 +11,12 @@ public class EmprestimoMapper {
     public static EmprestimoResponseDTO toResponseDTO(Emprestimo emprestimo){
         return new EmprestimoResponseDTO(
                 emprestimo.getId(),
-                emprestimo.getEquipamentoId(),
-                emprestimo.getColaboradorId(),
+                emprestimo.getEquipamento().getId(),
+                emprestimo.getColaborador().getId(),
                 emprestimo.getDataEmprestimo(),
                 emprestimo.getDataPrevistaDevolucao(),
                 emprestimo.getDataDevolucao()
         );
     }
 
-    public static Emprestimo toEntity(EmprestimoRequestDTO emprestimoRequestDTO){
-        return new Emprestimo(emprestimoRequestDTO.equipamentoId(), emprestimoRequestDTO.colaboradorId(), LocalDate.now());
-    }
 }
